@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Node Kiosk</string>
+    <string name="device_admin_label">Node Kiosk device administrator</string>
+</resources>
