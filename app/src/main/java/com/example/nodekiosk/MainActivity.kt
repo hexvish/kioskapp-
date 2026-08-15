@@ -30,6 +30,7 @@ class MainActivity : android.app.Activity() {
     private val retry = Runnable { if (errorPanel.visibility == View.VISIBLE) loadKioskUrl() }
 
     override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState); Log.i(TAG, "Kiosk startup")
+        title = KioskConfig.appName(this)
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         createContent(); hideSystemUi(); configureWebView(); loadKioskUrl()
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
@@ -39,7 +40,7 @@ class MainActivity : android.app.Activity() {
             )
         }
     }
-    override fun onResume() { super.onResume(); hideSystemUi(); KioskDeviceManager.configureAndEnter(this) }
+    override fun onResume() { super.onResume(); title = KioskConfig.appName(this); hideSystemUi(); KioskDeviceManager.configureAndEnter(this) }
     override fun onWindowFocusChanged(hasFocus: Boolean) { super.onWindowFocusChanged(hasFocus); if (hasFocus) hideSystemUi() }
     override fun onDestroy() { retryHandler.removeCallbacksAndMessages(null); webView.destroy(); super.onDestroy() }
     @Deprecated("Back navigation is intentionally disabled for kiosk operation")
