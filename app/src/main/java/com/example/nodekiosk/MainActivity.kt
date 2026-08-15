@@ -67,7 +67,7 @@ class MainActivity : android.app.Activity() {
     private fun showPasswordDialog() { Log.i(TAG, "Admin menu trigger activated"); val field = EditText(this).apply { inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD }
         AlertDialog.Builder(this).setTitle("Administrator access").setView(field).setNegativeButton("Cancel", null).setPositiveButton("Continue") { _, _ -> if (passwordMatches(field.text.toString())) startActivity(android.content.Intent(this, AdminMenuActivity::class.java)) }.show()
     }
-    private fun passwordMatches(value: String): Boolean { val digest = MessageDigest.getInstance("SHA-256").digest(value.toByteArray()).joinToString("") { "%02x".format(it) }; return digest == ADMIN_PASSWORD_SHA256 }
+    private fun passwordMatches(value: String): Boolean { val digest = MessageDigest.getInstance("SHA-256").digest(value.toByteArray()).joinToString("") { "%02x".format(it) }; return digest == KioskConfig.adminPasswordHash(this) }
     private fun hideSystemUi() {
         window.insetsController?.apply {
             hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
@@ -76,8 +76,5 @@ class MainActivity : android.app.Activity() {
         }
     }
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
-    companion object { private const val TAG = "NodeKiosk"; private const val RETRY_MS = 15_000L; private const val TAP_WINDOW_MS = 3_000L
-        // SHA-256 only; replace this digest with one generated for the deployment password before distribution.
-        private const val ADMIN_PASSWORD_SHA256 = "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5"
-    }
+    companion object { private const val TAG = "NodeKiosk"; private const val RETRY_MS = 15_000L; private const val TAP_WINDOW_MS = 3_000L }
 }

@@ -28,7 +28,19 @@ object KioskDeviceManager {
             Log.i(TAG, "Lock Task entered")
         }.onFailure { Log.e(TAG, "Could not configure Lock Task", it) }
     }
-    fun exitLockTask(activity: Activity) { runCatching { activity.stopLockTask() }.onFailure { Log.w(TAG, "Not in Lock Task", it) } }
+    fun exitLockTask(activity: Activity) {
+        runCatching {
+            val dpm = activity.getSystemService(DevicePolicyManager::class.java)
+            if (isDeviceOwner(activity)) {
+                if (android.os.Build.VERSION.SDK_INT >= 28) {
+                    dpm.setStatusBarDisabled(admin(activity), false)
+                }
+                dpm.clearPackagePersistentPreferredActivities(admin(activity), activity.packageName)
+            }
+            activity.stopLockTask()
+            Log.i(TAG, "Lock Task exited; system controls restored")
+        }.onFailure { Log.w(TAG, "Not in Lock Task", it) }
+    }
     fun reboot(activity: Activity): Boolean = runCatching {
         if (!isDeviceOwner(activity)) return false
         activity.getSystemService(DevicePolicyManager::class.java).reboot(admin(activity)); true
