@@ -11,7 +11,7 @@ import java.security.MessageDigest
 
 object KioskConfig {
     const val DEFAULT_SERVER_URL = "http://192.168.1.5:8000/"
-    const val DEFAULT_APP_NAME = "Kiosk"
+    const val DEFAULT_APP_NAME = "Gita GPT"
     const val DEFAULT_ADMIN_PASSWORD_SHA256 = "5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5"
     private const val PREFS = "kiosk_settings"
     private const val URL_KEY = "server_url"

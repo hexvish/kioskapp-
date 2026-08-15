@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">Kiosk</string>
-    <string name="device_admin_label">Kiosk device administrator</string>
+    <string name="app_name">Gita GPT</string>
+    <string name="device_admin_label">Gita GPT device administrator</string>
 </resources>

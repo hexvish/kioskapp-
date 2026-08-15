@@ -100,7 +100,7 @@ class AdminMenuActivity : android.app.Activity() {
     private fun changeAppName() {
         val entry = EditText(this).apply {
             setText(KioskConfig.appName(this@AdminMenuActivity))
-            hint = "Kiosk"
+            hint = "Gita GPT"
         }
         AlertDialog.Builder(this)
             .setTitle("Set App Name")
