@@ -31,6 +31,9 @@ class MainActivity : android.app.Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState); Log.i(TAG, "Kiosk startup")
         title = KioskConfig.appName(this)
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode = android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         createContent(); hideSystemUi(); configureWebView(); loadKioskUrl()
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
@@ -47,7 +50,14 @@ class MainActivity : android.app.Activity() {
     override fun onBackPressed() { Log.i(TAG, "Back navigation ignored in kiosk") }
 
     private fun createContent() {
-        val root = FrameLayout(this); webView = WebView(this); root.addView(webView, FrameLayout.LayoutParams(-1, -1))
+        val root = FrameLayout(this).apply { fitsSystemWindows = false }
+        webView = WebView(this).apply {
+            fitsSystemWindows = false
+            overScrollMode = View.OVER_SCROLL_NEVER
+            isVerticalScrollBarEnabled = false
+            isHorizontalScrollBarEnabled = false
+        }
+        root.addView(webView, FrameLayout.LayoutParams(-1, -1))
         errorPanel = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; gravity = Gravity.CENTER; setBackgroundColor(Color.rgb(32,32,32)); visibility = View.GONE
             addView(TextView(context).apply { text = "Unable to connect to kiosk server."; setTextColor(Color.WHITE); textSize = 20f; gravity = Gravity.CENTER })
             addView(Button(context).apply { text = "Retry"; setOnClickListener { loadKioskUrl() } }) }
@@ -84,11 +94,21 @@ class MainActivity : android.app.Activity() {
     }
     private fun passwordMatches(value: String): Boolean { val digest = MessageDigest.getInstance("SHA-256").digest(value.toByteArray()).joinToString("") { "%02x".format(it) }; return digest == KioskConfig.adminPasswordHash(this) }
     private fun hideSystemUi() {
-        window.insetsController?.apply {
-            hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
-            // Do not expose transient system bars from an edge swipe. Lock Task enforces this policy for a Device Owner.
-            systemBarsBehavior = WindowInsetsController.BEHAVIOR_DEFAULT
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            window.insetsController?.apply {
+                hide(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars() or WindowInsets.Type.captionBar())
+                systemBarsBehavior = WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
         }
+        @Suppress("DEPRECATION")
+        window.decorView.systemUiVisibility = (
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+            or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+            or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+            or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            or View.SYSTEM_UI_FLAG_FULLSCREEN
+        )
     }
     private fun dp(value: Int) = (value * resources.displayMetrics.density).toInt()
     companion object { private const val TAG = "NodeKiosk"; private const val RETRY_MS = 15_000L; private const val TAP_WINDOW_MS = 3_000L }
