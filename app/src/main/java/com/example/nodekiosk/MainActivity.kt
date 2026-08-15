@@ -55,7 +55,21 @@ class MainActivity : android.app.Activity() {
         val trigger = View(this).apply { setOnClickListener { registerCornerTap() }; isHapticFeedbackEnabled = false }
         root.addView(trigger, FrameLayout.LayoutParams(dp(72), dp(72), Gravity.BOTTOM or Gravity.END)); setContentView(root)
     }
-    @SuppressLint("SetJavaScriptEnabled") private fun configureWebView() { webView.settings.apply { javaScriptEnabled = true; domStorageEnabled = true; mediaPlaybackRequiresUserGesture = false; allowFileAccess = false; allowContentAccess = false; setSupportMultipleWindows(false) }
+    @SuppressLint("SetJavaScriptEnabled") private fun configureWebView() {
+        webView.settings.apply {
+            javaScriptEnabled = true
+            domStorageEnabled = true
+            databaseEnabled = true
+            useWideViewPort = true
+            loadWithOverviewMode = true
+            textZoom = 100
+            mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+            mediaPlaybackRequiresUserGesture = false
+            allowFileAccess = false
+            allowContentAccess = false
+            setSupportMultipleWindows(false)
+        }
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null)
         webView.isLongClickable = false; webView.setOnLongClickListener { true }; webView.webChromeClient = WebChromeClient()
         webView.webViewClient = object : WebViewClient() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean { val scheme = request.url.scheme; return scheme != "http" && scheme != "https" }
